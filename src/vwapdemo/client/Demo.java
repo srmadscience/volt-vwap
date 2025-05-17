@@ -18,8 +18,6 @@ import org.voltdb.voltutil.stats.SafeHistogramCache;
 public class Demo {
 
     SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd");
-    // SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-    // final String dayOfYear = df1.format(new Date(System.currentTimeMillis()));
 
     Client mainClient = null;
 
@@ -45,7 +43,8 @@ public class Demo {
     private void reset() throws IOException, NoConnectionsException, ProcCallException, InterruptedException {
 
         msg("Reset Database Starting...");
-        ClientResponse cr = mainClient.callProcedure("ResetDatabase");
+        mainClient.callProcedure("ResetDatabase");
+        Thread.sleep(5000);
         msg("Reset Database Finished.");
 
     }
@@ -81,50 +80,56 @@ public class Demo {
                 int day = 1;
 
                 while ((line = br.readLine()) != null) {
+
                     if (eventCount++ % 100000 == 0) {
                         msg("Row " + eventCount + " of file");
-
                     }
 
-                    String[] lineContents = line.split(",");
-                    try {
+                    // Some lines are mostly blank...
+                    if (! line.endsWith(",,,,,,")) {
+                        
+                        String[] lineContents = line.split(",");
+                        try {
 
-                        String symbol = lineContents[0];
-                        Date tickdate = df1.parse(lineContents[1]);
-                        double open = Double.parseDouble(lineContents[2]);
-                        double high = Double.parseDouble(lineContents[3]);
-                        double low = Double.parseDouble(lineContents[4]);
-                        double close = Double.parseDouble(lineContents[5]);
-                        double adjClose = Double.parseDouble(lineContents[6]);
-                        double volume = Double.parseDouble(lineContents[7]);
+                            String symbol = lineContents[0];
+                            Date tickdate = df1.parse(lineContents[1]);
+                            double open = Double.parseDouble(lineContents[2]);
+                            double high = Double.parseDouble(lineContents[3]);
+                            double low = Double.parseDouble(lineContents[4]);
+                            double close = Double.parseDouble(lineContents[5]);
+                            double adjClose = Double.parseDouble(lineContents[6]);
+                            double volume = Double.parseDouble(lineContents[7]);
 
-                        if (volume > 0) {
-                            ComplainOnErrorWithParamsCallback cwbc = new ComplainOnErrorWithParamsCallback(line);
-                            mainClient.callProcedure(cwbc, "ReportTick", symbol, tickdate, close, volume);
-                        }
-                    } catch (Exception e) {
-                        msg("Event " + eventCount + " is bad. line=" + line + " error=" + e.getMessage());
-                    }
+                            if (volume > 0) {
+                                ComplainOnErrorWithParamsCallback cwbc = new ComplainOnErrorWithParamsCallback(line,shc);
+                                mainClient.callProcedure(cwbc, "ReportTick", symbol, tickdate, close, volume);
+                            }
 
-                    // If we've already done as many requests this ms
-                    // as we're supposed to, sleep...
-                    if (transThisMs++ > tpThisPerMs) {
-
-                        // Sleep until the MS has changed...
-                        while (currentMs == System.currentTimeMillis()) {
-                            Thread.sleep(0, 50000);
-
+                        } catch (Exception e) {
+                            msg("Event " + eventCount + " is bad. line=" + line + " error=" + e.getMessage());
                         }
 
-                        // currentMs has changed...
-                        currentMs = System.currentTimeMillis();
-                        transThisMs = 0;
+                        // If we've already done as many requests this ms
+                        // as we're supposed to, sleep...
+                        if (transThisMs++ > tpThisPerMs) {
+
+                            // Sleep until the MS has changed...
+                            while (currentMs == System.currentTimeMillis()) {
+                                Thread.sleep(0, 50000);
+
+                            }
+
+                            // currentMs has changed...
+                            currentMs = System.currentTimeMillis();
+                            transThisMs = 0;
+                        }
                     }
 
                 }
 
                 br.close();
                 fr.close();
+                mainClient.drain();
 
             } catch (Exception e) {
                 msg(e.getMessage());

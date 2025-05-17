@@ -26,15 +26,19 @@ package vwapdemo.client;
 
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcedureCallback;
+import org.voltdb.voltutil.stats.SafeHistogramCache;
 
 
 public class ComplainOnErrorWithParamsCallback implements ProcedureCallback {
 
+    long startMs = System.currentTimeMillis();
+    SafeHistogramCache shc;
     String params;
 
-    public ComplainOnErrorWithParamsCallback(String params) {
+    public ComplainOnErrorWithParamsCallback(String params,SafeHistogramCache shc) {
         super();
         this.params = params;
+        this.shc = shc;
     }
 
     
@@ -45,6 +49,8 @@ public class ComplainOnErrorWithParamsCallback implements ProcedureCallback {
             Demo.msg("Error Code :" + arg0.getStatusString());
             Demo.msg("Matching Params :" + params);
         }
+        
+        shc.reportLatency("REPORT_TICK", startMs, params, 30);
 
     }
 
