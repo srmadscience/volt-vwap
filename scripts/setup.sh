@@ -13,7 +13,7 @@
 
 cd
 mkdir logs 2> /dev/null
-cd voltdb-vwap/ddl
+cd /home/ubuntu/volt-vwap/ddl
 
 sqlcmd --servers=vdb1 < create_db.sql
 
