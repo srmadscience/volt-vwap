@@ -7,9 +7,6 @@
  */
 package vwapdemo.server;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 import org.voltdb.SQLStmt;
 import org.voltdb.VoltProcedure;
 import org.voltdb.VoltTable;
@@ -26,16 +23,16 @@ public class GetDashboardData__promBL extends VoltProcedure {
 
 
     public static final SQLStmt getMaxdate = new SQLStmt(
-            "select max(tickdate) maxdate from stocktick_vmap_summary where timescale = ?;");
+            "select tickdate maxdate from stocktick_vmap_summary where timescale = ? order by tickdate desc limit 1;");
 
     public static final SQLStmt getLatestVolume = new SQLStmt(
-            "select 'latest_vwap_volume' STATNAME, 'latest_vwap_volume' STATHELP, timescale,  volume stat_value from stocktick_vmap_summary where timescale = ? and tickdate = ?;");
+            "select 'latest_vwap_volume' STATNAME, 'latest_vwap_volume' STATHELP, timescale,  volume STATVALUE from stocktick_vmap_summary where timescale = ? and tickdate = ?;");
 
     public static final SQLStmt getLatestTotalValue = new SQLStmt(
-            "select 'latest_vwap_total_value' STATNAME, 'latest_vwap_total_value' STATHELP, timescale,  TOTAL_VALUE stat_value from stocktick_vmap_summary where timescale = ? and tickdate = ?;");
+            "select 'latest_vwap_total_value' STATNAME, 'latest_vwap_total_value' STATHELP, timescale,  TOTAL_VALUE STATVALUE from stocktick_vmap_summary where timescale = ? and tickdate = ?;");
 
     public static final SQLStmt getLatestVWAP = new SQLStmt(
-            "select 'latest_vwap_vwap' STATNAME, 'latest_vwap_vwap' STATHELP, timescale,  TOTAL_VALUE / Volume stat_value from stocktick_vmap_summary where timescale = ? and tickdate = ?;");
+            "select 'latest_vwap_vwap' STATNAME, 'latest_vwap_vwap' STATHELP, timescale, TOTAL_VALUE / Volume STATVALUE from stocktick_vmap_summary where timescale = ? and tickdate = ?;");
 
    
 	// @formatter:on
