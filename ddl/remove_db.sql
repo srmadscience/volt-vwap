@@ -13,6 +13,7 @@ file -inlinebatch END_OF_BATCH
 DROP PROCEDURE ReportTick IF EXISTS;
 DROP PROCEDURE ResetDatabase IF EXISTS;
 
+DROP VIEW stocktick_vmap_summary IF EXISTS;
 DROP TABLE dummy IF EXISTS;
 DROP TABLE stocktick_vmap IF EXISTS;
 

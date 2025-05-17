@@ -29,6 +29,10 @@ CREATE TABLE stocktick_vmap
 
 partition TABLE stocktick_vmap on column symbol;
 
+CREATE VIEW stocktick_vmap_summary AS
+SELECT tickdate,timescale, sum(volume) volume, sum(total_value) total_value, count(*) how_many
+FROM stocktick_vmap
+GROUP BY tickdate,timescale;
 
 CREATE PROCEDURE 
    PARTITION ON TABLE stocktick_vmap COLUMN symbol
