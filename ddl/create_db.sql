@@ -38,6 +38,9 @@ CREATE PROCEDURE
    PARTITION ON TABLE stocktick_vmap COLUMN symbol
    FROM CLASS vwapdemo.server.ReportTick;
    
+CREATE PROCEDURE 
+   FROM CLASS vwapdemo.server.GetDashboardData__promBL;
+   
 CREATE PROCEDURE ResetDatabase AS
 DELETE FROM stocktick_vmap;
 

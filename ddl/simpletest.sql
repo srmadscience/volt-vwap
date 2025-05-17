@@ -12,3 +12,4 @@ select * from stocktick_vmap;
 exec ReportTick 'TSLA' '2025-04-05 12:20:02' 10.1 300;
 select * from stocktick_vmap;
 
+select * from stocktick_vmap_summary;se
