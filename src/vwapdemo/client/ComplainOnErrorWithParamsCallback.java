@@ -50,7 +50,7 @@ public class ComplainOnErrorWithParamsCallback implements ProcedureCallback {
             Demo.msg("Matching Params :" + params);
         }
         
-        shc.reportLatency("REPORT_TICK", startMs, params, 30);
+        shc.reportLatency("REPORT_TICK", startMs, "", 1000);
 
     }
 

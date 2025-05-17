@@ -59,6 +59,7 @@ public class Demo {
 
         int maxEventCount = 0;
         int eventCount = 0;
+        int skipCount = 0;
         File f = new File(filename);
 
         long tpThisPerMs = tpMs;
@@ -85,9 +86,11 @@ public class Demo {
                         msg("Row " + eventCount + " of file");
                     }
 
-                    // Some lines are mostly blank...
-                    if (! line.endsWith(",,,,,,")) {
-                        
+                    // Some lines are mostly blank. Others are headers...
+                    if (line.endsWith(",,,,,,") || line.endsWith("Date,Open,High,Low,Close,Adj Close,Volume")) {
+                        skipCount++;
+                    } else {
+
                         String[] lineContents = line.split(",");
                         try {
 
@@ -101,7 +104,8 @@ public class Demo {
                             double volume = Double.parseDouble(lineContents[7]);
 
                             if (volume > 0) {
-                                ComplainOnErrorWithParamsCallback cwbc = new ComplainOnErrorWithParamsCallback(line,shc);
+                                ComplainOnErrorWithParamsCallback cwbc = new ComplainOnErrorWithParamsCallback(line,
+                                        shc);
                                 mainClient.callProcedure(cwbc, "ReportTick", symbol, tickdate, close, volume);
                             }
 
@@ -136,6 +140,7 @@ public class Demo {
             }
 
             msg("Finished...");
+            msg(eventCount + " Reports, " + skipCount + " skipped");
 
             msg(shc.toString());
 
