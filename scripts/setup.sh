@@ -18,7 +18,7 @@ cd /home/ubuntu/volt-vwap/ddl
 sqlcmd --servers=vdb1 < create_db.sql
 
 cd ../scripts
-$HOME/bin/reload_dashboards.sh voltdb-vwap.json
+$HOME/bin/reload_dashboards.sh volt-vwap.json
 
 #java  ${JVMOPTS}  -jar $HOME/bin/addtodeploymentdotxml.jar `cat $HOME/.vdbhostnames`  deployment $HOME/voltdb-charglt/scripts/export_and_import.xml
 
