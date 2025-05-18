@@ -18,7 +18,6 @@ import java.util.Date;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
-import org.voltdb.client.ClientResponse;
 import org.voltdb.client.NoConnectionsException;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.voltutil.stats.SafeHistogramCache;
@@ -42,6 +41,7 @@ public class Demo {
             mainClient = connectVoltDB(hostnames);
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(3);
         }
 
         this.filename = filename;
@@ -102,6 +102,7 @@ public class Demo {
                         String[] lineContents = line.split(",");
                         try {
 
+                            // As of now we don't use all these values...
                             String symbol = lineContents[0];
                             Date tickdate = df1.parse(lineContents[1]);
                             double open = Double.parseDouble(lineContents[2]);
@@ -112,6 +113,7 @@ public class Demo {
                             double volume = Double.parseDouble(lineContents[7]);
 
                             if (volume > 0) {
+                                // Do not create Zero volume entries
                                 ComplainOnErrorWithParamsCallback cwbc = new ComplainOnErrorWithParamsCallback(line,
                                         shc);
                                 mainClient.callProcedure(cwbc, "ReportTick", symbol, tickdate, close, volume);

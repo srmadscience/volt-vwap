@@ -73,6 +73,9 @@ public class ReportTick extends VoltProcedure {
     public VoltTable[] run(String symbol, TimestampType tickdate, BigDecimal value, BigDecimal volume)
             throws VoltAbortException {
 
+        
+        // First call to voltQueueSQL is for any existing Month, Week and DAY values
+        // and any rolling day value for this symbol...
         for (int i = 0; i < theTimes.length; i++) {
             voltQueueSQL(theGets[i], symbol, tickdate);
         }
@@ -123,6 +126,7 @@ public class ReportTick extends VoltProcedure {
                 try {
                     newVmap = newEntryTotalValue.divide(newEntryVolume, 12, RoundingMode.HALF_UP);
                 } catch (java.lang.ArithmeticException e) {
+                    // zero volume led to error...
                     newVmap = new BigDecimal(0);
                 }
 
@@ -132,6 +136,7 @@ public class ReportTick extends VoltProcedure {
 
         }
 
+        // Do rolling week stuff...
         currentTicks[currentTicks.length - 1].advanceRow();
         final TimestampType rollingTickdate = currentTicks[currentTicks.length - 1].getTimestampAsTimestamp("TICKDATE");
         voltQueueSQL(upsertRollingWeekTick, rollingTickdate, value, symbol, rollingTickdate, rollingTickdate);
